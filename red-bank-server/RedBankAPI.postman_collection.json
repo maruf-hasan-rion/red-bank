@@ -1,0 +1,630 @@
+{
+  "info": {
+    "_postman_id": "red-bank-api-v2",
+    "name": "Red Bank API",
+    "description": "Red Bank - Blood Donation Management Platform API.\n\nAuthentication flow:\n1. Call **Create Session** with a Firebase ID token (Authorization: Bearer {{firebaseIdToken}}). This sets httpOnly `accessToken` + `refreshToken` cookies.\n2. All cookie-session routes use those cookies automatically (Postman Cookie Jar).\n3. Mutations require an `X-CSRF-Token` header; the collection pre-request script fetches it automatically from `GET /api/auth/csrf`.\n\nVariables to set in the environment:\n- `baseUrl`: e.g. http://localhost:5000\n- `firebaseIdToken`: a current Firebase ID token for the user you are testing with",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const method = (pm.request.method || '').toUpperCase();",
+          "if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {",
+          "  const base = pm.variables.get('baseUrl');",
+          "  if (base) {",
+          "    pm.sendRequest({ url: base + '/api/auth/csrf', method: 'GET' }, (err, res) => {",
+          "      if (!err && res.code === 200) {",
+          "        const token = res.json()?.data?.csrfToken;",
+          "        if (token) pm.request.headers.add({ key: 'X-CSRF-Token', value: token });",
+          "      }",
+          "    });",
+          "  }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Create Session",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{firebaseIdToken}}", "type": "text" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/auth/session", "host": ["{{baseUrl}}"], "path": ["api", "auth", "session"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get CSRF Token",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/csrf", "host": ["{{baseUrl}}"], "path": ["api", "auth", "csrf"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/user", "host": ["{{baseUrl}}"], "path": ["api", "auth", "user"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User (Register)",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{firebaseIdToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Donor\",\n  \"avatar\": \"https://example.com/avatar.png\",\n  \"bloodGroup\": \"O+\",\n  \"district\": \"Dhaka\",\n  \"upazila\": \"Mirpur\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/create-user", "host": ["{{baseUrl}}"], "path": ["api", "auth", "create-user"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/refresh-token", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh-token"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Donor Updated\",\n  \"bloodGroup\": \"A+\",\n  \"district\": \"Chattogram\",\n  \"upazila\": \"Patiya\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/user/update", "host": ["{{baseUrl}}"], "path": ["api", "auth", "user", "update"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Role (Admin)",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"volunteer\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user/update/role?id={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "user", "update", "role"],
+              "query": [{ "key": "id", "value": "{{userId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Status (Admin)",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/user/update/status?id={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "user", "update", "status"],
+              "query": [{ "key": "id", "value": "{{userId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Create Donation Request",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donationDate\": \"2026-09-15\",\n  \"donationTime\": \"10:30\",\n  \"fullAddress\": \"Zahir Raihan Rd, Dhaka\",\n  \"hospitalName\": \"Dhaka Medical College Hospital\",\n  \"recipientEmail\": \"recipient@example.com\",\n  \"recipientName\": \"Rahim Ahmed\",\n  \"recipientDistrict\": \"Dhaka\",\n  \"recipientUpazila\": \"Motijheel\",\n  \"bloodGroup\": \"O+\",\n  \"donationMsg\": \"Urgent need of O+ blood for surgery.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/donation/create", "host": ["{{baseUrl}}"], "path": ["api", "donation", "create"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Claim Donation Request",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{donationId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/donation/claim", "host": ["{{baseUrl}}"], "path": ["api", "donation", "claim"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Donations",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/donation?limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation"],
+              "query": [{ "key": "limit", "value": "50" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Donation Details",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/details?id={{donationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "details"],
+              "query": [{ "key": "id", "value": "{{donationId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Donation (Public view)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/single?postId={{donationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "single"],
+              "query": [{ "key": "postId", "value": "{{donationId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Paginated Donations",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/paginated?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "paginated"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "pending", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Donation Request",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donationMsg\": \"Updated message for donors.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/update?id={{donationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "update"],
+              "query": [{ "key": "id", "value": "{{donationId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Donation Status (owner/staff)",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"canceled\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/update?id={{donationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "update"],
+              "query": [{ "key": "id", "value": "{{donationId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Donation Request",
+          "event": [],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/donation/delete?id={{donationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "donation", "delete"],
+              "query": [{ "key": "id", "value": "{{donationId}}" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Blogs",
+      "item": [
+        {
+          "name": "Create Blog (Admin/Volunteer)",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postTitle\": \"Why Blood Donation Matters\",\n  \"permalink\": \"why-blood-donation-matters\",\n  \"thumbnail\": \"https://example.com/thumb.jpg\",\n  \"shortDescription\": \"A short intro to the post.\",\n  \"content\": \"<p>Full blog content here.</p>\",\n  \"status\": \"published\",\n  \"timeToRead\": 4\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/blog/create", "host": ["{{baseUrl}}"], "path": ["api", "blog", "create"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Blog (by permalink)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/post/details?permalink=why-blood-donation-matters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "post", "details"],
+              "query": [{ "key": "permalink", "value": "why-blood-donation-matters" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Blogs",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/post/all?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "post", "all"],
+              "query": [
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Blog Management Details (Admin/Volunteer)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/management/details?id={{blogId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "management", "details"],
+              "query": [{ "key": "id", "value": "{{blogId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Paginated Blogs (Admin/Volunteer)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/all/paginated?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "all", "paginated"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "draft", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Permalink",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/verify-permalink?link=my-blog-post",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "verify-permalink"],
+              "query": [{ "key": "link", "value": "my-blog-post" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Blog (Admin/Volunteer)",
+          "event": [],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postTitle\": \"Why Blood Donation Matters (Updated)\",\n  \"status\": \"published\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/post/update?id={{blogId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "post", "update"],
+              "query": [{ "key": "id", "value": "{{blogId}}" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Blog (Admin)",
+          "event": [],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/blog/delete?id={{blogId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blog", "delete"],
+              "query": [{ "key": "id", "value": "{{blogId}}" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Overview (Admin)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/dashboard/overview", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "overview"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Paginated Users (Admin)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/users?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "active", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Paginated Donations (Admin/Volunteer)",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/donations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "donations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "pending", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Search Donors",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"district\": \"Dhaka\",\n  \"blood\": \"O+\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/public/donors", "host": ["{{baseUrl}}"], "path": ["api", "public", "donors"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Public Donations",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/public/donations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "public", "donations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Platform Stats",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/public/status", "host": ["{{baseUrl}}"], "path": ["api", "public", "status"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Subscribe to Newsletter",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"subscriber@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/public/subscribe", "host": ["{{baseUrl}}"], "path": ["api", "public", "subscribe"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Contact Message",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+8801700000000\",\n  \"company\": \"Example Blood Bank\",\n  \"message\": \"I would like to know how to organize a donation drive.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/public/contact", "host": ["{{baseUrl}}"], "path": ["api", "public", "contact"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment Intent",
+          "event": [],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"note\": \"Monthly donation\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/payment/create-intent", "host": ["{{baseUrl}}"], "path": ["api", "payment", "create-intent"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Funds",
+          "event": [],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payment/funds?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payment", "funds"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "firebaseIdToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "donationId", "value": "" },
+    { "key": "blogId", "value": "" }
+  ]
+}

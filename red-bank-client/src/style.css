@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    --background: 11 44% 96%;
+    --foreground: 0 0% 9%;
+    --border: 220 14% 91%;
+    --input: 220 14% 91%;
+    --ring: 0 84% 60%;
+    --muted: 220 9% 46%;
+    --muted-foreground: 220 9% 46%;
+    --destructive: 0 72% 51%;
+    --color-1: 0 100% 63%;
+    --color-2: 270 100% 63%;
+    --color-3: 210 100% 63%;
+    --color-4: 195 100% 63%;
+    --color-5: 90 100% 63%;
+  }
+
+:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+  }
+}
+
+/* From Uiverse.io by milley69 */
+.loading svg polyline {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.loading svg polyline#back {
+  fill: none;
+  stroke: #ff4d5033;
+}
+
+.loading svg polyline#front {
+  fill: none;
+  stroke: #ff4d4f;
+  stroke-dasharray: 48, 144;
+  stroke-dashoffset: 192;
+  animation: dash_682 1.4s linear infinite;
+}
+
+@keyframes dash_682 {
+  72.5% {
+    opacity: 0;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+::selection {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.swal2-popup {
+  border-radius: 21px !important;
+  border: 4px solid #ff00008a !important;
+}
+
+.swal2-confirm {
+  background: rgba(255, 0, 0, 0.632) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+@layer base {
+  img {
+    display: initial;
+  }
+}
+
+a.jodit-status-bar-link {
+  display: none !important;
+}
+
+html {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.blogDetails {
+  p,
+  ul,
+  ol {
+    font-size: 14px !important;
+  }
+  ol,
+  ul {
+    list-style: disc;
+  }
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+.jodit-wysiwyg {
+  font-family: "Source Serif 4", serif !important;
+}
+.jodit {
+  font-family: "Source Serif 4", serif !important;
+}
+body {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+header,
+#main_container {
+  flex: 1 0 auto;
+}
+.jodit-wysiwyg {
+  padding: 20px !important;
+}
+
+footer {
+  .loading svg polyline#back {
+    fill: none;
+    stroke: #ffffff33;
+  }
+  .loading svg polyline#front {
+    stroke: #ffffff;
+  }
+}
+
+.css-1bcxhkm-menu {
+  z-index: 999999999999999999999999 !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
