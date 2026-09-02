@@ -1,10 +1,8 @@
-import { cert, getApps, initializeApp } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
 import AppError from '../utils/AppError.js';
 
 let firebaseAuth;
 
-const getFirebaseAuth = () => {
+const getFirebaseAuth = async () => {
   if (firebaseAuth) {
     return firebaseAuth;
   }
@@ -15,6 +13,9 @@ const getFirebaseAuth = () => {
   if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
     throw new AppError('Firebase Admin configuration is missing', 503);
   }
+
+  const { cert, getApps, initializeApp } = await import('firebase-admin/app');
+  const { getAuth } = await import('firebase-admin/auth');
 
   const app = getApps()[0] || initializeApp({
     credential: cert({
@@ -28,5 +29,5 @@ const getFirebaseAuth = () => {
   return firebaseAuth;
 };
 
-export const verifyFirebaseIdToken = (token) =>
-  getFirebaseAuth().verifyIdToken(token);
+export const verifyFirebaseIdToken = async (token) =>
+  (await getFirebaseAuth()).verifyIdToken(token);
