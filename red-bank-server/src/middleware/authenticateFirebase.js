@@ -16,7 +16,8 @@ export const authenticateFirebase = async (req, res, next) => {
 
     req.firebaseUser = await verifyFirebaseIdToken(token);
     return next();
-  } catch {
+  } catch (error) {
+    console.error('[Firebase] ID token verification failed:', error?.message);
     return next(new AppError('Invalid Firebase authentication', 401));
   }
 };
